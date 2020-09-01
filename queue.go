@@ -68,18 +68,18 @@ func (qp *QueuePool) Get() (net.Conn, error) {
 		if conn == nil {
 			return nil, ErrPoolConnClosed
 		}
-		return conn, nil
+		return NewReusableConn(conn, qp), nil
 	default:
 		conn, err := qp.constructor()
 		if err != nil {
 			return nil, ErrCreateConnFail
 		}
-		return conn, nil
+		return NewReusableConn(conn, qp), nil
 	}
 }
 
-// Put enqueues a connection from the pool (queue)
-func (qp *QueuePool) Put(conn net.Conn) error {
+// put enqueues a connection from the pool (queue)
+func (qp *QueuePool) put(conn net.Conn) error {
 	if conn == nil {
 		return ErrNilConnEnqueued
 	}
